@@ -52,8 +52,9 @@ export async function getGroup({ id }: { id: string }) {
     .leftJoin(users, eq(users.id, usersGroups.userId))
     .leftJoin(expenses, eq(expenses.groupId, groups.id))
     .where(eq(id as any, groups.id));
+  console.log('r?', group);
   const formatted = group.reduce<
-    Record<string, { group: Group; members: Users[]; expenses: Expenses[] }>
+    Record<string, { group: Group; members: Record<number, Users>; expenses: Record<number, Expenses> }>
   >((acc, row) => {
     const group = row.groups;
     const user = row.users;
@@ -66,15 +67,20 @@ export async function getGroup({ id }: { id: string }) {
       };
     }
     if (user) {
-      acc[group.id].members.push(user);
+      acc[group.id].members[user.id] = user
     }
     if (expense) {
-      acc[group.id].expenses.push(expense);
+      console.log('e?', expense);
+      acc[group.id].expenses[expense.id] = expense;
     }
     return acc;
   }, {});
-
-  return Object.values(formatted)[0];
+  const formattedArray = Object.values(formatted)[0];
+  return {
+    group: formattedArray.group,
+    members: Object.values(formattedArray.members),
+    expenses: Object.values(formattedArray.expenses),
+  }
 }
 
 export async function createExpense({
@@ -99,7 +105,7 @@ export async function createExpense({
     description,
     createdBy,
     paidBy,
-  });
+  }).returning();
 }
 
 export async function getExpense({ expenseId }: { expenseId: number }) {
@@ -134,9 +140,9 @@ export async function createExpenseSplits({
   expenseId: number;
   splits?: {
     amount: number;
+    userId: number;
     settled?: boolean;
     settledDate?: Date;
-    userId?: number;
   }[];
 }) {
   await db.transaction(async (tx) => {

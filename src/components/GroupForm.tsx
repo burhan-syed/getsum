@@ -24,7 +24,7 @@ export function GroupForm({ handleFormAction }: GroupFormProps) {
   return (
     <form action={handleFormAction}>
       <div>
-        <label htmlFor={"group-name"}>Group Name:</label>
+        <label htmlFor="group-name" >Group Name:</label>
         <input type="text" id="group-name" name="groupName" required />
       </div>
 
