@@ -44,13 +44,14 @@ export async function createGroup({
   return insert;
 }
 
-export async function getGroup({ id }: { id: number }) {
+export async function getGroup({ id }: { id: string }) {
   const group = await db
     .select()
     .from(groups)
     .leftJoin(usersGroups, eq(usersGroups.groupId, groups.id))
     .leftJoin(users, eq(users.id, usersGroups.userId))
-    .leftJoin(expenses, eq(expenses.groupId, groups.id));
+    .leftJoin(expenses, eq(expenses.groupId, groups.id))
+    .where(eq(id as any, groups.id));
   const formatted = group.reduce<
     Record<string, { group: Group; members: Users[]; expenses: Expenses[] }>
   >((acc, row) => {
