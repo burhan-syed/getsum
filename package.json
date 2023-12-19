@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:push": "drizzle-kit push:pg"
+    "db:push": "drizzle-kit push:pg",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "drizzle-orm": "^0.29.1",
+    "nanoid": "^5.0.4",
     "next": "14.0.4",
     "postgres": "^3.4.3",
     "react": "^18",

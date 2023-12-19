@@ -1,4 +1,14 @@
-import { boolean, date, integer, numeric, pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  date,
+  doublePrecision,
+  integer,
+  numeric,
+  pgTable,
+  serial,
+  text,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 export const groups = pgTable("groups", {
   id: varchar("id").primaryKey(),
@@ -18,21 +28,23 @@ export const usersGroups = pgTable("users_groups", {
 
 export const expenses = pgTable("expenses", {
   id: serial("id").primaryKey(),
-  created: date('created').defaultNow(),
-  updated: date('updated').defaultNow(),
+  created: date("created", { mode: "date" }).defaultNow(),
+  updated: date("updated", { mode: "date" }).defaultNow(),
   title: text("title").notNull(),
-  total: numeric('total').notNull(),
+  total: doublePrecision("total").notNull(),
   description: text("description"),
   groupId: varchar("group_id").references(() => groups.id),
   createdBy: integer("created_by").references(() => users.id),
-  paidBy: integer("paid_by").references(() => users.id)
+  paidBy: integer("paid_by").references(() => users.id),
 });
 
 export const expenseSplits = pgTable("expense_splits", {
   id: serial("id").primaryKey(),
-  amount: numeric('total').notNull(),
-  settled: boolean('settled').default(false),
-  settledDate: date('settled_date'),
-  userId: integer('user_id').references(() => users.id),
-  expenseId: integer('expense_id').references(() => expenses.id),
+  amount: doublePrecision("total").notNull(),
+  settled: boolean("settled").default(false),
+  settledDate: date("settled_date", { mode: "date" }),
+  userId: integer("user_id").references(() => users.id),
+  expenseId: integer("expense_id")
+    .references(() => expenses.id)
+    .notNull(),
 });
