@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Button } from "./ui/Button";
 
 type ExpenseFormProps = {
   groupId: string;
@@ -86,7 +87,7 @@ export function ExpenseForm({
           ))}
       </div>
 
-      <button>Submit</button>
+      <Button>Submit</Button>
     </form>
   );
 }

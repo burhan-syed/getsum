@@ -1,16 +1,17 @@
 "use client";
 import { useState } from "react";
 import { nanoid } from "nanoid";
+import { Button } from "./ui/Button";
 
 type GroupFormProps = {
   handleFormAction: (data: FormData) => Promise<any>;
 };
 
 export function GroupForm({ handleFormAction }: GroupFormProps) {
-  const [members, setMembers] = useState<{id: string, name: string}[]>([]);
+  const [members, setMembers] = useState<{ id: string; name: string }[]>([]);
 
   const addMember = () => {
-    setMembers((m) => [...m, {id: nanoid(), name: ""}]);
+    setMembers((m) => [...m, { id: nanoid(), name: "" }]);
   };
 
   const removeMember = (id: string) => {
@@ -18,13 +19,13 @@ export function GroupForm({ handleFormAction }: GroupFormProps) {
   };
 
   const handleMemberChange = (id: string, value: string) => {
-    setMembers((m) => m.map((v) => v.id === id ? {...v, name: value} : v));
+    setMembers((m) => m.map((v) => (v.id === id ? { ...v, name: value } : v)));
   };
 
   return (
     <form action={handleFormAction}>
       <div>
-        <label htmlFor="group-name" >Group Name:</label>
+        <label htmlFor="group-name">Group Name:</label>
         <input type="text" id="group-name" name="groupName" required />
       </div>
 
@@ -47,7 +48,7 @@ export function GroupForm({ handleFormAction }: GroupFormProps) {
       <button type="button" onClick={addMember}>
         Add Member
       </button>
-      <button>Create</button>
+      <Button>Create</Button>
     </form>
   );
 }
