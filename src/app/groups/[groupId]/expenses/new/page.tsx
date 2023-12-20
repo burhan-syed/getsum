@@ -1,4 +1,11 @@
-import { ExpenseForm } from "@/components/ExpenseForm";
+import { ExpenseForm } from "@/components/forms/ExpenseForm";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card";
 import { createExpense, createExpenseSplits, getGroup } from "@/lib/db/queries";
 import { redirect } from "next/navigation";
 
@@ -13,7 +20,9 @@ async function handleNewExpenseAction(data: FormData) {
   const groupId = data.get("groupId")?.valueOf();
   const title = data.get("title")?.valueOf();
   const total = Number(data.get("total")?.valueOf());
-  const members = data.getAll("members[]");
+  const members = [...data.entries()]
+    .filter(([k, v]) => k.substring(0, 9) === "members[]")
+    .map(([k, v]) => Number(k.split("-")[1]));
   const splits = [...data.entries()]
     .filter(([k, v]) => k.substring(0, 8) === "splits[]")
     .map(([k, v]) => ({
@@ -35,6 +44,7 @@ async function handleNewExpenseAction(data: FormData) {
   if (splits.some((s) => typeof s.amount !== "number")) {
     throw new Error("invalid split amounts");
   }
+  // console.log({title, total, members, splits, e: JSON.stringify(data.entries(), null, 2)})
 
   const expense = await createExpense({
     groupId,
@@ -54,13 +64,20 @@ export default async function ExpenseEditPage({
   const { group, expenses, members } = await getGroup({ id: params.groupId });
 
   return (
-    <div>
-      group {params.groupId} expense edit
-      <ExpenseForm
-        groupId={group.id}
-        members={members}
-        handleExpenseFormAction={handleNewExpenseAction}
-      />
-    </div>
+    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+      <Card className="sm:w-3/4">
+        <CardHeader>
+          <CardTitle>Create New Expense</CardTitle>
+          <CardDescription>Adds Expense to {group.name}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ExpenseForm
+            groupId={group.id}
+            members={members}
+            handleExpenseFormAction={handleNewExpenseAction}
+          />
+        </CardContent>
+      </Card>
+    </main>
   );
 }

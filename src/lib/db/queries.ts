@@ -70,7 +70,6 @@ export async function getGroup({ id }: { id: string }) {
       acc[group.id].members[user.id] = user
     }
     if (expense) {
-      console.log('e?', expense);
       acc[group.id].expenses[expense.id] = expense;
     }
     return acc;
