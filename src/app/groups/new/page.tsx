@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import { GroupForm } from "@/components/forms/GroupForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { createGroup } from "@/lib/db/queries";
@@ -20,15 +21,13 @@ async function handleGroupCreateForm(data: FormData) {
 
 export default function GroupsNewPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <Card className="sm:w-3/4">
-        <CardHeader>
-          <CardTitle>Create a New Group</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <GroupForm handleFormAction={handleGroupCreateForm} />
-        </CardContent>
-      </Card>
-    </main>
+    <>
+      <Header />
+      <main className="flex min-h-[calc(100vh-4rem)] flex-col mt-16 mx-auto max-w-4xl px-4 py-4">
+        <h1>Create New Group</h1>
+        <div className="my-4"></div>
+        <GroupForm handleFormAction={handleGroupCreateForm} />
+      </main>
+    </>
   );
 }

@@ -20,15 +20,8 @@ export default async function GroupPage({ params }: GroupPageProps) {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
-      <h1>Group {group.name}</h1>
+    <>
       <div>{group.id}</div>
-      {/* <h3>Members</h3> */}
-      {/* <ul>
-        {members.map((m) => (
-          <li key={m.id}>{m.fullName}</li>
-        ))}
-      </ul> */}
       <h3>Expenses</h3>
       <ul>
         {expenses.map((e) => (
@@ -36,10 +29,13 @@ export default async function GroupPage({ params }: GroupPageProps) {
             {e.title} (${e.total})
           </li>
         ))}
+        {[...new Array(100)]
+          .fill(0)
+          .map((_, i) => i)
+          .map((v) => (
+            <li key={v}>row {v}</li>
+          ))}
       </ul>
-      <Link href={`/groups/${group.id}/expenses/new`}>
-        <Button>Add Expense</Button>
-      </Link>
-    </main>
+    </>
   );
 }

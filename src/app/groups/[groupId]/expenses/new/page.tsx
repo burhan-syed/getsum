@@ -1,11 +1,4 @@
 import { ExpenseForm } from "@/components/forms/ExpenseForm";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
 import { createExpense, createExpenseSplits, getGroup } from "@/lib/db/queries";
 import { redirect } from "next/navigation";
 
@@ -64,20 +57,14 @@ export default async function ExpenseEditPage({
   const { group, expenses, members } = await getGroup({ id: params.groupId });
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <Card className="sm:w-3/4">
-        <CardHeader>
-          <CardTitle>Create New Expense</CardTitle>
-          <CardDescription>Adds Expense to {group.name}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ExpenseForm
-            groupId={group.id}
-            members={members}
-            handleExpenseFormAction={handleNewExpenseAction}
-          />
-        </CardContent>
-      </Card>
-    </main>
+    <div className="sm:px-4 py-4">
+      <h2>Create a new Expense</h2>
+      <div className="my-2 sm:my-4"></div>
+      <ExpenseForm
+        groupId={group.id}
+        members={members}
+        handleExpenseFormAction={handleNewExpenseAction}
+      />
+    </div>
   );
 }

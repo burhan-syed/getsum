@@ -52,7 +52,6 @@ export async function getGroup({ id }: { id: string }) {
     .leftJoin(users, eq(users.id, usersGroups.userId))
     .leftJoin(expenses, eq(expenses.groupId, groups.id))
     .where(eq(id as any, groups.id));
-  console.log('r?', group);
   const formatted = group.reduce<
     Record<string, { group: Group; members: Record<number, Users>; expenses: Record<number, Expenses> }>
   >((acc, row) => {

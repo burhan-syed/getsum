@@ -117,11 +117,9 @@ export function ExpenseForm({
 
       <div className="flex flex-row gap-2">
         <Button>Create</Button>
-        <Link href={".."}>
-          <Button type="button" variant={"outline"}>
-            Cancel
-          </Button>
-        </Link>
+        <Button asChild type="button" variant={"outline"}>
+          <Link href={".."}>Cancel</Link>
+        </Button>
       </div>
     </form>
   );
