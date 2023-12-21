@@ -54,9 +54,10 @@ export default async function RootLayout({
       <div className="flex min-h-[calc(100vh-8rem)] sm:min-h-[calc(100vh-4rem)] flex-col items-center sm:mt-16 mb-16 sm:mb-0 mx-auto max-w-4xl">
         <div className="flex flex-row w-full">
           <aside className="w-36 flex-none sticky top-16 self-start  hidden sm:block overflow-hidden">
-            
             <div className="px-2 mt-16">
-              <h3 className="h-8 border-b flex items-center font-semibold">Members</h3>
+              <h3 className="h-8 border-b flex items-center font-semibold">
+                <Link href={`/groups/${group.id}/balances`} >Members</Link>
+              </h3>
               <ul>
                 {members.map((m) => (
                   <li

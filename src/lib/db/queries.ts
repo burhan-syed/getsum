@@ -1,4 +1,4 @@
-import { eq, or } from "drizzle-orm";
+import { and, eq, inArray, or } from "drizzle-orm";
 import db from ".";
 import { expenseSplits, expenses, groups, users, usersGroups } from "./schema";
 import { nanoid } from "nanoid";
@@ -58,9 +58,11 @@ export async function updateGroup({
   const { balances } = await getExpenses({ groupId });
   Object.values(balances).forEach((b) => {
     if (b.balance !== 0 && !members?.find((m) => m.id === b.user.id)) {
-      throw new UserError(`cannot remove ${b.user.fullName} due to outstanding balance`);
+      throw new UserError(
+        `cannot remove ${b.user.fullName} due to outstanding balance`
+      );
     }
-  })
+  });
   await db.transaction(async (tx) => {
     const nameUpdate = tx
       .update(groups)
@@ -401,5 +403,47 @@ export async function deleteExpense({ expenseId }: { expenseId: number }) {
       .delete(expenseSplits)
       .where(eq(expenseSplits.expenseId, expenseId));
     await tx.delete(expenses).where(eq(expenses.id, expenseId));
+  });
+}
+
+export async function settleExpenses({
+  groupId,
+  userId,
+}: {  
+  groupId: string;
+  userId: number;
+}) {
+  await db.transaction(async (tx) => {
+    const personalPaidBy = await tx
+      .select({ id: expenses.id })
+      .from(expenses)
+      .where(
+        and(
+          eq(userId as any, expenses.paidBy),
+          eq(groupId as any, expenses.groupId)
+        )
+      );
+    const groupExpenses = await tx
+      .select({ id: expenses.id })
+      .from(expenses)
+      .where(eq(groupId as any, expenses.groupId));
+    const expensesToUpdate = groupExpenses.filter((g) =>
+      personalPaidBy.some((p) => p.id !== g.id)
+    );
+    if (expensesToUpdate.length > 0) {
+      await tx
+        .update(expenseSplits)
+        .set({ settled: true, settledDate: new Date() })
+        .where(
+          and(
+            eq(expenseSplits.settled, false),
+            eq(expenseSplits.userId, userId as any),
+            inArray(
+              expenseSplits.expenseId,
+              expensesToUpdate.map((e) => e.id)
+            )
+          )
+        );
+    }
   });
 }
