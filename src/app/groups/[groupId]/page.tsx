@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/Button";
-import { getGroup } from "@/lib/db/queries";
+import { getExpenses, getGroup } from "@/lib/db/queries";
 import Link from "next/link";
 
 type GroupPageProps = {
@@ -9,32 +9,36 @@ type GroupPageProps = {
 };
 
 export default async function GroupPage({ params }: GroupPageProps) {
-  const { group, expenses, members } = await getGroup({ id: params.groupId });
-
+  const { group, members } = await getGroup({ id: params.groupId });
+  const { expenses } = await getExpenses({ groupId: params.groupId });
   if (!group.id) {
-    return (
-      <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        group not found
-      </main>
-    );
+    return <div>group not found</div>;
   }
 
   return (
     <>
-      <div>{group.id}</div>
-      <h3>Expenses</h3>
-      <ul>
-        {expenses.map((e) => (
+      <h3 className="h-8 border-b sticky top-16 px-4 flex items-center font-semibold">
+        Expenses
+      </h3>
+      <ul className="divide-y-2 border-b">
+        {expenses.map(({expense: e}) => (
           <li key={e.id}>
-            {e.title} (${e.total})
+            <Link
+              href={`/groups/${group.id}/expenses/${e.id}`}
+              className="h-14 p-0.5 px-4 flex items-center gap-2 hover:bg-gradient-to-b from-transparent via-transparent to-black/5 cursor-pointer group text-sm "
+            >
+              <div className="text-sm opacity-50">
+                <span>{e.created?.getMonth()}</span>/
+                <span>{e.created?.getDate()}</span>
+              </div>
+              <h4 className="group-hover:underline">{e.title}</h4>
+              <div className="ml-auto flex flex-col items-end">
+                <span className="text-xs">{e?.paidBy?.fullName}</span>
+                <span>USD{e.total.toFixed(2)}</span>
+              </div>
+            </Link>
           </li>
         ))}
-        {[...new Array(100)]
-          .fill(0)
-          .map((_, i) => i)
-          .map((v) => (
-            <li key={v}>row {v}</li>
-          ))}
       </ul>
     </>
   );

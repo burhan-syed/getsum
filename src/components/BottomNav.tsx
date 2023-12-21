@@ -35,7 +35,7 @@ export default function BottomNav({ groupId }: { groupId: string }) {
           <span className="text-xs">Members</span>
         </Link>
         <Link
-          href={"/"}
+          href={`/groups/${groupId}/edit`}
           className="flex flex-col items-center justify-center w-1/5"
         >
           <Settings />

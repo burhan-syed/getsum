@@ -22,23 +22,82 @@ type ExpenseFormProps = {
     fullName: string;
   }[];
   handleExpenseFormAction: (data: FormData) => Promise<any>;
+  handleDeleteAction?: (d: {
+    expenseId: number;
+    groupId: string;
+  }) => Promise<any>;
+  data?: {
+    id: number;
+    title: string;
+    total: number;
+    paidBy: number;
+    splits: { userId: number; amount: number }[];
+  };
 };
 
 export function ExpenseForm({
   groupId,
   members,
+  handleDeleteAction,
   handleExpenseFormAction,
+  data,
 }: ExpenseFormProps) {
-  const [total, setTotal] = useState<number>(0);
-  const [selectedMembers, setSelectedMembers] = useState<number[]>(() =>
-    members.map((m) => m.id)
+  const [errorMessage, setErrorMessage] = useState("");
+  const [title, setTitle] = useState(data?.title ?? "");
+  const [total, setTotal] = useState<number>(data?.total ?? 0);
+  const [paidBy, setPaidBy] = useState<string | undefined>(
+    data?.paidBy?.toString() ?? undefined
   );
+  const [splits, setSplits] = useState<{
+    [userId: number]: { userId: number; amount: number };
+  }>(
+    data?.splits?.reduce(
+      (acc: { [userId: number]: { userId: number; amount: number } }, r) => {
+        if (r.userId) {
+          acc[r.userId] = r;
+        }
+
+        return acc;
+      },
+      {}
+    ) ?? {}
+  );
+  const [selectedMembers, setSelectedMembers] = useState<number[]>(
+    () => data?.splits?.map((s) => s.userId) ?? members.map((m) => m.id)
+  );
+
+  const handleSplitChange = (userId: number, value: number) => {
+    // console.log("h?", {userId, value}, splits[userId]);
+    const s = {...splits, [userId]: {userId, amount: value}};
+    setSplits(s);
+    // setSplits((s) => {
+    //   s[userId] = { userId: userId, amount: value };
+    //   return s;
+    // });
+  };
+
+  const formAction = async(formData: FormData) => {
+    const res = await handleExpenseFormAction(formData);
+    if (res && res?.error) {
+      setErrorMessage(res.error);
+    }
+  }
+
   return (
-    <form action={handleExpenseFormAction} className="flex flex-col gap-4">
+    <form action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="groupId" value={groupId} required />
+      <input type="hidden" name="expenseId" value={data?.id} />
+
       <div>
         <Label htmlFor="expense-title">Title</Label>
-        <Input type="text" id="expense-title" name="title" required />
+        <Input
+          type="text"
+          id="expense-title"
+          name="title"
+          required
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
       </div>
       <div>
         <Label htmlFor="expense-total">Total</Label>
@@ -51,7 +110,7 @@ export function ExpenseForm({
           onChange={(e) => setTotal(+(e.target.value || ""))}
         />
       </div>
-      <h4>Members</h4>
+      <h4>Participants</h4>
       <div className="flex flex-row items-center gap-2">
         {members.map((member) => (
           <div key={member.id} className="flex items-center gap-1">
@@ -73,7 +132,11 @@ export function ExpenseForm({
       </div>
       <div>
         <Label htmlFor="paid-by">Paid By</Label>
-        <Select name="paidBy">
+        <Select
+          name="paidBy"
+          value={paidBy}
+          onValueChange={(v) => setPaidBy(v)}
+        >
           <SelectTrigger>
             <SelectValue placeholder={"Select Name"} />
           </SelectTrigger>
@@ -87,15 +150,6 @@ export function ExpenseForm({
               ))}
           </SelectContent>
         </Select>
-        {/* <select id="paid-by" name="paidBy">
-          {members
-            .filter(({ id }) => selectedMembers.includes(id))
-            .map((member) => (
-              <option key={member.id} value={member.id}>
-                {member.fullName}
-              </option>
-            ))}
-        </select> */}
       </div>
       <div>
         <h4>Splits</h4>
@@ -110,13 +164,28 @@ export function ExpenseForm({
                 type="number"
                 min={0}
                 required
+                value={splits?.[member.id]?.amount}
+                onChange={(e) => handleSplitChange(member.id, +e.target.value)}
               />
             </div>
           ))}
       </div>
 
+      {errorMessage && <span className="py-1 text-destructive text-xs">{errorMessage}</span>}
+
       <div className="flex flex-row gap-2">
-        <Button>Create</Button>
+        <Button>{data?.id ? "Update" : "Create"}</Button>
+        {data?.id && handleDeleteAction && (
+          <Button
+            type="button"
+            variant={"destructive"}
+            onClick={() =>
+              handleDeleteAction({ expenseId: data.id, groupId: groupId })
+            }
+          >
+            Delete
+          </Button>
+        )}
         <Button asChild type="button" variant={"outline"}>
           <Link href={".."}>Cancel</Link>
         </Button>

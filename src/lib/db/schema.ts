@@ -35,7 +35,9 @@ export const expenses = pgTable("expenses", {
   description: text("description"),
   groupId: varchar("group_id").references(() => groups.id),
   createdBy: integer("created_by").references(() => users.id),
-  paidBy: integer("paid_by").references(() => users.id),
+  paidBy: integer("paid_by")
+    .references(() => users.id)
+    .notNull(),
 });
 
 export const expenseSplits = pgTable("expense_splits", {
@@ -43,7 +45,9 @@ export const expenseSplits = pgTable("expense_splits", {
   amount: doublePrecision("total").notNull(),
   settled: boolean("settled").default(false),
   settledDate: date("settled_date", { mode: "date" }),
-  userId: integer("user_id").references(() => users.id),
+  userId: integer("user_id")
+    .references(() => users.id)
+    .notNull(),
   expenseId: integer("expense_id")
     .references(() => expenses.id)
     .notNull(),
