@@ -28,11 +28,11 @@ export default function BottomNav({ groupId }: { groupId: string }) {
           <span className="text-xs text-center">Add</span>
         </Link>
         <Link
-          href={"/"}
+          href={`/groups/${groupId}/balances`}
           className="flex flex-col items-center justify-center w-1/5"
         >
           <Users />
-          <span className="text-xs">Members</span>
+          <span className="text-xs">Balances</span>
         </Link>
         <Link
           href={`/groups/${groupId}/edit`}
