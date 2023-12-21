@@ -27,8 +27,8 @@ export default async function GroupPage({ params }: GroupPageProps) {
               href={`/groups/${group.id}/expenses/${e.id}`}
               className="h-14 p-0.5 px-4 flex items-center gap-2 hover:bg-gradient-to-b from-transparent via-transparent to-black/5 cursor-pointer group text-sm "
             >
-              <div className="text-sm opacity-50">
-                <span>{e.created?.getMonth()}</span>/
+              <div className="text-sm text-slate-500">
+                <span>{(e.created?.getMonth() ?? 0) + 1}</span>/
                 <span>{e.created?.getDate()}</span>
               </div>
               <h4 className="group-hover:underline">{e.title}</h4>

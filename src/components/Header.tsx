@@ -11,8 +11,8 @@ export default function Header({ groupName }: HeaderProps) {
     <>
       <header
         className={cn(
-          groupName && "hidden sm:block",
-          "h-16 fixed top-0 left-0 right-0 border-b"
+          groupName ? "hidden sm:block" : "border-b",
+          "h-16 fixed top-0 left-0 right-0 "
         )}
       >
         <div className="flex items-center mx-auto max-w-4xl h-full px-4">

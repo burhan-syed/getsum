@@ -11,8 +11,8 @@ export default function GroupHeader({
   groupName: string;
 }) {
   return (
-    <div className="px-4 h-16 flex items-center w-full">
-      <h1 className="font-bold"><Link href={`/groups/${groupId}`}>{groupName}</Link></h1>
+    <div className="px-4 h-16 flex items-center w-full z-10 relative">
+      <h1 className="font-bold text-lg"><Link href={`/groups/${groupId}`}>{groupName}</Link></h1>
       <div className="ml-auto flex gap-1.5">
         <Button asChild variant={"ghost"} className="hidden sm:flex">
           <Link href={`/groups/${groupId}/edit`}>

@@ -52,11 +52,14 @@ export default async function RootLayout({
         groupId={group?.id ?? undefined}
       />
       <div className="flex min-h-[calc(100vh-8rem)] sm:min-h-[calc(100vh-4rem)] flex-col items-center sm:mt-16 mb-16 sm:mb-0 mx-auto max-w-4xl">
+        <div className="sticky top-0 bg-slate-100 w-full">
+          <GroupHeader groupId={group.id} groupName={group.name!} />
+        </div>
         <div className="flex flex-row w-full">
           <aside className="w-36 flex-none sticky top-16 self-start  hidden sm:block overflow-hidden">
-            <div className="px-2 mt-16">
+            <div className="px-2">
               <h3 className="h-8 border-b flex items-center font-semibold">
-                <Link href={`/groups/${group.id}/balances`} >Members</Link>
+                <Link href={`/groups/${group.id}/balances`}>Members</Link>
               </h3>
               <ul>
                 {members.map((m) => (
@@ -81,10 +84,7 @@ export default async function RootLayout({
               </ul>
             </div>
           </aside>
-          <main className="min-h-[calc(100vh-4rem)] w-full sm:shadow-md">
-            <div className="sticky top-0 bg-white">
-              <GroupHeader groupId={group.id} groupName={group.name!} />
-            </div>
+          <main className="min-h-[calc(100vh-8rem)] w-full sm:shadow-md">
             <div className="flex-none flex-grow sm:border-l">{children}</div>
           </main>
         </div>
