@@ -407,41 +407,30 @@ export async function deleteExpense({ expenseId }: { expenseId: number }) {
 }
 
 export async function settleExpenses({
-  groupId,
   userId,
-}: {  
-  groupId: string;
+  expenseIds,
+}: {
   userId: number;
+  expenseIds: number[];
 }) {
   await db.transaction(async (tx) => {
-    const personalPaidBy = await tx
-      .select({ id: expenses.id })
-      .from(expenses)
+    const splits = await tx
+      .select({ id: expenseSplits.id })
+      .from(expenseSplits)
       .where(
         and(
-          eq(userId as any, expenses.paidBy),
-          eq(groupId as any, expenses.groupId)
+          eq(userId as any, expenseSplits.userId),
+          inArray(expenseSplits.expenseId, expenseIds)
         )
       );
-    const groupExpenses = await tx
-      .select({ id: expenses.id })
-      .from(expenses)
-      .where(eq(groupId as any, expenses.groupId));
-    const expensesToUpdate = groupExpenses.filter((g) =>
-      personalPaidBy.some((p) => p.id !== g.id)
-    );
-    if (expensesToUpdate.length > 0) {
+    if (splits.length > 0) {
       await tx
         .update(expenseSplits)
         .set({ settled: true, settledDate: new Date() })
         .where(
-          and(
-            eq(expenseSplits.settled, false),
-            eq(expenseSplits.userId, userId as any),
-            inArray(
-              expenseSplits.expenseId,
-              expensesToUpdate.map((e) => e.id)
-            )
+          inArray(
+            expenseSplits.expenseId,
+            splits.map((e) => e.id)
           )
         );
     }

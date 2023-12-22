@@ -11,14 +11,16 @@ type BalancesPageProps = {
 
 async function handleSettleExpenses({
   userId,
+  expenseIds,
   groupId,
 }: {
   userId: number;
+  expenseIds: number[];
   groupId: string;
 }) {
   "use server";
   try {
-    await settleExpenses({ userId, groupId });
+    await settleExpenses({ userId, expenseIds });
     revalidatePath(`/groups/${groupId}`);
   } catch (err) {
     return { error: "something went wrong" };
@@ -67,19 +69,23 @@ export default async function BalancesPage({ params }: BalancesPageProps) {
           >
             <div className="flex flex-col justify-between">
               <h3>{s.user.fullName}</h3>
-              {Object.values(s.others).some(o => o.amount < 0) && (
+              {/* {Object.values(s.others).some((o) => o.amount < 0) && (
+                // TODO
                 <SettleButton
                   userId={s.user.id}
                   groupId={params.groupId}
+                  expenseIds={Object.values(s.others).filter((o) => o.amount < 0).map(s => s.)}
                   handleSubmit={handleSettleExpenses}
                 />
-              )}
+              )} */}
             </div>
 
             <div className="text-right">
               <ul>
                 {Object.values(s.others)
-                  .sort((a, b) => a.user.fullName.localeCompare(b.user.fullName))
+                  .sort((a, b) =>
+                    a.user.fullName.localeCompare(b.user.fullName)
+                  )
                   .map((o) => (
                     <li key={`${o.user.id}_balance_to_${s.user.id}}`}>
                       <span

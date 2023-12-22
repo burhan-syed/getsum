@@ -7,17 +7,23 @@ import { Loader } from "lucide-react";
 export default function SettleButton({
   groupId,
   userId,
+  expenseIds,
   handleSubmit,
 }: {
   groupId: string;
   userId: number;
-  handleSubmit: (d: { groupId: string; userId: number }) => Promise<any>;
+  expenseIds: number[];
+  handleSubmit: (d: {
+    groupId: string;
+    userId: number;
+    expenseIds: number[];
+  }) => Promise<any>;
 }) {
   const [loading, setLoading] = useState(false);
   const handleClick = async () => {
     setLoading(true);
     try {
-      await handleSubmit({ groupId, userId });
+      await handleSubmit({ groupId, userId, expenseIds });
     } catch (error) {
     } finally {
       setLoading(false);
@@ -31,7 +37,11 @@ export default function SettleButton({
       className="px-2 h-4 text-xs gap-2"
     >
       Settle Debts
-      {loading && <div className="animate-spin"><Loader size={10}/></div>}
+      {loading && (
+        <div className="animate-spin">
+          <Loader size={10} />
+        </div>
+      )}
     </Button>
   );
 }
