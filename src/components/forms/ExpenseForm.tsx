@@ -191,7 +191,7 @@ export function ExpenseForm({
                 type="text"
                 required
                 pattern="\d*\.?\d{0,2}"
-                disabled={true || splits?.[member.id]?.settled}
+                disabled={splits?.[member.id]?.settled}
                 value={splits?.[member.id]?.amount ?? ""}
                 onChange={(e) => handleSplitChange(member.id, e.target.value)}
               />
