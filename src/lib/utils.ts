@@ -23,7 +23,7 @@ export function parseExpenseForm(data: FormData) {
   if (!title || typeof title !== "string") {
     throw new Error("invalid title");
   }
-  if (!total || typeof total !== "number") {
+  if (!total || typeof total !== "number" || isNaN(total)) {
     throw new Error("invalid total");
   }
   if (!groupId || typeof groupId !== "string") {
@@ -35,10 +35,13 @@ export function parseExpenseForm(data: FormData) {
   if (splits.some((s) => typeof s.userId !== "number")) {
     throw new Error("invalid user ids");
   }
-  if (splits.some((s) => typeof s.amount !== "number")) {
+  if (splits.some((s) => typeof s.amount !== "number" || isNaN(s.amount))) {
     throw new Error("invalid split amounts");
   }
-  if (splits.reduce((acc, s) => (acc += s.amount), 0) !== total) {
+  const splitsSum = splits.reduce((acc, s) => (acc += s.amount), 0);
+  const roundedDiff = Math.round(Math.abs(total - splitsSum) * 100)
+  // greater than 1 cent difference
+  if (roundedDiff > 1) {
     throw new Error("splits sum must equal total");
   }
   // console.log({title, total, members, splits, e: JSON.stringify(data.entries(), null, 2)})

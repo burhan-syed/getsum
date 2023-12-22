@@ -5,7 +5,8 @@ import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Label } from "../ui/Label";
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
+import { Loader, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type GroupFormProps = {
   handleFormAction: (data: FormData) => Promise<any>;
@@ -20,6 +21,7 @@ type GroupFormProps = {
 };
 
 export function GroupForm({ handleFormAction, data }: GroupFormProps) {
+  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [groupName, setGroupName] = useState(data?.groupName ?? "");
   const [members, setMembers] = useState<{ id: string; name: string }[]>(
@@ -52,9 +54,16 @@ export function GroupForm({ handleFormAction, data }: GroupFormProps) {
   };
 
   const formAction = async (formData: FormData) => {
-    const res = await handleFormAction(formData);
-    if (res && res?.error) {
-      setErrorMessage(res.error);
+    try {
+      setLoading(true);
+      const res = await handleFormAction(formData);
+      if (res && res?.error) {
+        setErrorMessage(res.error);
+      }
+    } catch (err) {
+      setErrorMessage("something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,7 +120,16 @@ export function GroupForm({ handleFormAction, data }: GroupFormProps) {
       )}
 
       <div className="flex flex-row gap-2">
-        <Button>{data?.id ? "Update" : "Create"}</Button>
+        <Button disabled={loading} className={cn(loading && "opacity-80")}>
+          {loading && (
+            <div className="animate-spin absolute">
+              <Loader size={14} />
+            </div>
+          )}
+          <span className={cn(loading && "opacity-0")}>
+            {data?.id ? "Update" : "Create"}
+          </span>
+        </Button>
         <Button asChild type="button" variant={"outline"}>
           <Link href={data?.id ? `/groups/${data.id}` : ".."}>Cancel</Link>
         </Button>
