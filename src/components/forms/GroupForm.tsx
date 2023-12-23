@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { nanoid } from "nanoid";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
@@ -53,7 +53,9 @@ export function GroupForm({ handleFormAction, data }: GroupFormProps) {
     setMembers((m) => m.map((v) => (v.id === id ? { ...v, name: value } : v)));
   };
 
-  const formAction = async (formData: FormData) => {
+  const formAction = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
     try {
       setLoading(true);
       const res = await handleFormAction(formData);
@@ -68,7 +70,7 @@ export function GroupForm({ handleFormAction, data }: GroupFormProps) {
   };
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form onSubmit={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="groupId" value={data?.id} />
       <div>
         <Label htmlFor="group-name">Group Name:</Label>

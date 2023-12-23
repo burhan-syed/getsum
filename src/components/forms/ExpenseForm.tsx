@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import type { ChangeEvent, Dispatch, SetStateAction } from "react";
+import type { FormEvent } from "react";
 import { Button } from "../ui/Button";
 import { Label } from "../ui/Label";
 import { Input } from "../ui/Input";
@@ -54,7 +54,7 @@ export function ExpenseForm({
     data?.paidBy?.toString() ?? undefined
   );
   const [splits, setSplits] = useState<{
-    [userId: number]: { userId: number; amount: string, settled?:boolean };
+    [userId: number]: { userId: number; amount: string; settled?: boolean };
   }>(
     data?.splits?.reduce(
       (acc: { [userId: number]: { userId: number; amount: string } }, r) => {
@@ -90,7 +90,9 @@ export function ExpenseForm({
     }
   };
 
-  const formAction = async (formData: FormData) => {
+  const formAction = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
     try {
       setLoading(true);
       const res = await handleExpenseFormAction(formData);
@@ -105,7 +107,7 @@ export function ExpenseForm({
   };
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form onSubmit={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="groupId" value={groupId} required />
       <input type="hidden" name="expenseId" value={data?.id} />
 
@@ -184,7 +186,12 @@ export function ExpenseForm({
           .filter(({ id }) => selectedMembers.includes(id))
           .map((member) => (
             <div key={`splits-${member.id}`}>
-              <Label htmlFor={`split-${member.id}`}>{member.fullName}{splits?.[member.id]?.settled && <span className="opacity-60 ml-2 font-light">settled</span>}</Label>
+              <Label htmlFor={`split-${member.id}`}>
+                {member.fullName}
+                {splits?.[member.id]?.settled && (
+                  <span className="opacity-60 ml-2 font-light">settled</span>
+                )}
+              </Label>
               <Input
                 id={`split-${member.id}`}
                 name={`splits[]-${member.id}`}
@@ -210,7 +217,9 @@ export function ExpenseForm({
               <Loader size={14} />
             </div>
           )}
-          <span className={cn(loading && "opacity-0")}>{data?.id ? "Update" : "Create"}</span>
+          <span className={cn(loading && "opacity-0")}>
+            {data?.id ? "Update" : "Create"}
+          </span>
         </Button>
         {data?.id && handleDeleteAction && (
           <Button
